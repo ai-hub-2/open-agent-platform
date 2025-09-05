@@ -2268,11 +2268,7 @@ __metadata:
     prettier: ^3.5.2
     prettier-plugin-tailwindcss: ^0.6.11
     react: ^19.0.0
-<<<<<<< HEAD
     react-day-picker: ^9.9.0
-=======
-    react-day-picker: latest
->>>>>>> 56c0f84 (feat: add future scheduling)
     react-dom: ^19.0.0
     react-hook-form: ^7.56.3
     react-markdown: ^10.1.0
