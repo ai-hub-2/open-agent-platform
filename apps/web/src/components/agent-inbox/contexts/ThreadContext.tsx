@@ -451,14 +451,12 @@ function ThreadsProviderInternal<
 
       // Add scheduling information if provided
       if (options?.scheduledFor) {
-        // Calculate afterSeconds from the scheduled time
         const scheduledTime = new Date(options.scheduledFor);
         const currentTime = new Date();
         const afterSeconds = Math.floor(
           (scheduledTime.getTime() - currentTime.getTime()) / 1000,
         );
 
-        // Only add afterSeconds if it's positive (future time)
         if (afterSeconds > 0) {
           createRunPayload.afterSeconds = afterSeconds;
         }
@@ -469,9 +467,9 @@ function ThreadsProviderInternal<
           ...createRunPayload,
           streamMode: "events",
         };
-        return client.runs.stream(threadId, assistantId, streamPayload) as any; // Type assertion needed due to conditional return type
+        return client.runs.stream(threadId, assistantId, streamPayload) as any; 
       }
-      return client.runs.create(threadId, assistantId, createRunPayload) as any; // Type assertion needed due to conditional return type
+      return client.runs.create(threadId, assistantId, createRunPayload) as any; 
     } catch (e: any) {
       logger.error("Error sending human response", e);
       throw e;
