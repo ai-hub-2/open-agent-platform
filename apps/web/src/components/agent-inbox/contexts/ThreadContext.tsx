@@ -467,9 +467,9 @@ function ThreadsProviderInternal<
           ...createRunPayload,
           streamMode: "events",
         };
-        return client.runs.stream(threadId, assistantId, streamPayload) as any; 
+        return client.runs.stream(threadId, assistantId, streamPayload) as any;
       }
-      return client.runs.create(threadId, assistantId, createRunPayload) as any; 
+      return client.runs.create(threadId, assistantId, createRunPayload) as any;
     } catch (e: any) {
       logger.error("Error sending human response", e);
       throw e;
