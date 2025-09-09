@@ -14,6 +14,7 @@ import { CircleX, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { logger } from "../utils/logger";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { SplitButton } from "@/components/ui/split-button";
 
 function ResetButton({ handleReset }: { handleReset: () => void }) {
   return (
@@ -166,22 +167,22 @@ function ResponseComponent({
       </div>
 
       <div className="flex w-full items-center justify-end gap-0">
-        <Button
+        <SplitButton
           variant="brand"
-          disabled={streaming}
-          onClick={handleSubmit}
-          className="rounded-r-none"
-        >
-          Send Response
-        </Button>
-        <Button
-          variant="outline"
-          disabled={streaming}
-          onClick={handleSchedule}
-          className="rounded-l-none"
-        >
-          {isScheduling ? "Schedule" : "Schedule Task"}
-        </Button>
+          size="default"
+          buttons={[
+            {
+              label: "Send Response",
+              onClick: handleSubmit,
+              disabled: streaming,
+            },
+            {
+              label: isScheduling ? "Schedule" : "Schedule Task",
+              onClick: handleSchedule,
+              disabled: streaming,
+            },
+          ]}
+        />
       </div>
     </div>
   );
@@ -220,22 +221,18 @@ function AcceptComponent({
         />
       )}
       <div className="flex w-full items-center justify-end gap-0">
-        <Button
+        <SplitButton
           variant="brand"
-          disabled={streaming}
-          onClick={handleSubmit}
-          className="rounded-r-none"
-        >
-          Accept
-        </Button>
-        <Button
-          variant="outline"
-          disabled={streaming}
-          onClick={handleSchedule}
-          className="rounded-l-none"
-        >
-          {isScheduling ? "Schedule" : "Schedule Task"}
-        </Button>
+          size="default"
+          buttons={[
+            { label: "Accept", onClick: handleSubmit, disabled: streaming },
+            {
+              label: isScheduling ? "Schedule" : "Schedule Task",
+              onClick: handleSchedule,
+              disabled: streaming,
+            },
+          ]}
+        />
       </div>
     </div>
   );
@@ -386,22 +383,18 @@ function EditAndOrAcceptComponent({
       })}
 
       <div className="flex w-full items-center justify-end gap-0">
-        <Button
+        <SplitButton
           variant="brand"
-          disabled={streaming}
-          onClick={handleSubmit}
-          className="rounded-r-none"
-        >
-          {buttonText}
-        </Button>
-        <Button
-          variant="outline"
-          disabled={streaming}
-          onClick={handleSchedule}
-          className="rounded-l-none"
-        >
-          {isScheduling ? "Schedule" : "Schedule Task"}
-        </Button>
+          size="default"
+          buttons={[
+            { label: buttonText, onClick: handleSubmit, disabled: streaming },
+            {
+              label: isScheduling ? "Schedule" : "Schedule Task",
+              onClick: handleSchedule,
+              disabled: streaming,
+            },
+          ]}
+        />
       </div>
     </div>
   );
