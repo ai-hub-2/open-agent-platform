@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CircleX, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { logger } from "../utils/logger";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 
 function ResetButton({ handleReset }: { handleReset: () => void }) {
   return (
@@ -83,6 +84,11 @@ interface InboxItemInputProps {
   handleSubmit: (
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
   ) => Promise<void>;
+  handleScheduledSubmit: (scheduledTime: Date) => Promise<void>;
+  scheduledTime?: Date;
+  setScheduledTime: (date: Date | undefined) => void;
+  isScheduling: boolean;
+  setIsScheduling: (value: boolean) => void;
 }
 
 function ResponseComponent({
@@ -92,6 +98,10 @@ function ResponseComponent({
   interruptValue,
   onResponseChange,
   handleSubmit,
+  handleSchedule,
+  isScheduling,
+  scheduledTime,
+  setScheduledTime,
 }: {
   humanResponse: HumanResponseWithEdits[];
   streaming: boolean;
@@ -101,6 +111,10 @@ function ResponseComponent({
   handleSubmit: (
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
   ) => Promise<void>;
+  handleSchedule: () => void;
+  isScheduling: boolean;
+  scheduledTime?: Date;
+  setScheduledTime: (date: Date | undefined) => void;
 }) {
   const res = humanResponse.find((r) => r.type === "response");
   if (!res || typeof res.args !== "string") {
@@ -131,6 +145,14 @@ function ResponseComponent({
         <ArgsRenderer args={interruptValue.action_request.args} />
       )}
 
+      {isScheduling && (
+        <DateTimePicker
+          date={scheduledTime}
+          onDateChange={setScheduledTime}
+          placeholder="Select date and time..."
+        />
+      )}
+
       <div className="flex w-full flex-col items-start gap-[6px]">
         <p className="min-w-fit text-sm font-medium">Response</p>
         <Textarea
@@ -143,13 +165,22 @@ function ResponseComponent({
         />
       </div>
 
-      <div className="flex w-full items-center justify-end gap-2">
+      <div className="flex w-full items-center justify-end gap-0">
         <Button
           variant="brand"
           disabled={streaming}
           onClick={handleSubmit}
+          className="rounded-r-none"
         >
           Send Response
+        </Button>
+        <Button
+          variant="outline"
+          disabled={streaming}
+          onClick={handleSchedule}
+          className="rounded-l-none"
+        >
+          {isScheduling ? "Schedule" : "Schedule Task"}
         </Button>
       </div>
     </div>
@@ -161,26 +192,51 @@ function AcceptComponent({
   streaming,
   actionRequestArgs,
   handleSubmit,
+  handleSchedule,
+  isScheduling,
+  scheduledTime,
+  setScheduledTime,
 }: {
   streaming: boolean;
   actionRequestArgs: Record<string, any>;
   handleSubmit: (
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
   ) => Promise<void>;
+  handleSchedule: () => void;
+  isScheduling: boolean;
+  scheduledTime?: Date;
+  setScheduledTime: (date: Date | undefined) => void;
 }) {
   return (
     <div className="flex w-full flex-col items-start gap-4 rounded-lg border-[1px] border-gray-300 p-6">
       {actionRequestArgs && Object.keys(actionRequestArgs).length > 0 && (
         <ArgsRenderer args={actionRequestArgs} />
       )}
-      <Button
-        variant="brand"
-        disabled={streaming}
-        onClick={handleSubmit}
-        className="w-full"
-      >
-        Accept
-      </Button>
+      {isScheduling && (
+        <DateTimePicker
+          date={scheduledTime}
+          onDateChange={setScheduledTime}
+          placeholder="Select date and time..."
+        />
+      )}
+      <div className="flex w-full items-center justify-end gap-0">
+        <Button
+          variant="brand"
+          disabled={streaming}
+          onClick={handleSubmit}
+          className="rounded-r-none"
+        >
+          Accept
+        </Button>
+        <Button
+          variant="outline"
+          disabled={streaming}
+          onClick={handleSchedule}
+          className="rounded-l-none"
+        >
+          {isScheduling ? "Schedule" : "Schedule Task"}
+        </Button>
+      </div>
     </div>
   );
 }
@@ -192,6 +248,10 @@ function EditAndOrAcceptComponent({
   onEditChange,
   handleSubmit,
   interruptValue,
+  handleSchedule,
+  isScheduling,
+  scheduledTime,
+  setScheduledTime,
 }: {
   humanResponse: HumanResponseWithEdits[];
   streaming: boolean;
@@ -205,6 +265,10 @@ function EditAndOrAcceptComponent({
   handleSubmit: (
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
   ) => Promise<void>;
+  handleSchedule: () => void;
+  isScheduling: boolean;
+  scheduledTime?: Date;
+  setScheduledTime: (date: Date | undefined) => void;
 }) {
   const defaultRows = React.useRef<Record<string, number>>({});
   const editResponse = humanResponse.find((r) => r.type === "edit");
@@ -220,6 +284,10 @@ function EditAndOrAcceptComponent({
           actionRequestArgs={interruptValue?.action_request?.args || {}}
           streaming={streaming}
           handleSubmit={handleSubmit}
+          handleSchedule={handleSchedule}
+          isScheduling={isScheduling}
+          scheduledTime={scheduledTime}
+          setScheduledTime={setScheduledTime}
         />
       );
     }
@@ -272,6 +340,14 @@ function EditAndOrAcceptComponent({
         <ResetButton handleReset={handleReset} />
       </div>
 
+      {isScheduling && (
+        <DateTimePicker
+          date={scheduledTime}
+          onDateChange={setScheduledTime}
+          placeholder="Select date and time..."
+        />
+      )}
+
       {Object.entries(editResponse.args.args).map(([k, v], idx) => {
         const value = ["string", "number"].includes(typeof v)
           ? v
@@ -309,13 +385,22 @@ function EditAndOrAcceptComponent({
         );
       })}
 
-      <div className="flex w-full items-center justify-end gap-2">
+      <div className="flex w-full items-center justify-end gap-0">
         <Button
           variant="brand"
           disabled={streaming}
           onClick={handleSubmit}
+          className="rounded-r-none"
         >
           {buttonText}
+        </Button>
+        <Button
+          variant="outline"
+          disabled={streaming}
+          onClick={handleSchedule}
+          className="rounded-l-none"
+        >
+          {isScheduling ? "Schedule" : "Schedule Task"}
         </Button>
       </div>
     </div>
@@ -339,6 +424,11 @@ export function InboxItemInput({
   setHasEdited,
   setHasAddedResponse,
   handleSubmit,
+  handleScheduledSubmit,
+  scheduledTime,
+  setScheduledTime,
+  isScheduling,
+  setIsScheduling,
 }: InboxItemInputProps) {
   const isEditAllowed = interruptValue?.config?.allow_edit ?? false;
   const isResponseAllowed = interruptValue?.config?.allow_respond ?? false;
@@ -497,6 +587,34 @@ export function InboxItemInput({
     });
   };
 
+  const handleSchedule = React.useCallback(() => {
+    if (!isScheduling) {
+      setIsScheduling(true);
+      return;
+    }
+    if (!scheduledTime) {
+      toast("Please select a date and time", {
+        description: "Choose a future time to schedule this action.",
+        duration: 4000,
+      });
+      return;
+    }
+    handleScheduledSubmit(scheduledTime)
+      .then(() => {
+        setIsScheduling(false);
+        setScheduledTime(undefined);
+      })
+      .catch(() => {
+        // Error toast is handled in the action hook
+      });
+  }, [
+    isScheduling,
+    scheduledTime,
+    handleScheduledSubmit,
+    setIsScheduling,
+    setScheduledTime,
+  ]);
+
   return (
     <div
       className={cn(
@@ -516,6 +634,10 @@ export function InboxItemInput({
           interruptValue={interruptValue}
           onEditChange={onEditChange}
           handleSubmit={handleSubmit}
+          handleSchedule={handleSchedule}
+          isScheduling={isScheduling}
+          scheduledTime={scheduledTime}
+          setScheduledTime={setScheduledTime}
         />
         {supportsMultipleMethods ? (
           <div className="mt-4 mb-2 flex w-full items-center justify-center">
@@ -530,6 +652,10 @@ export function InboxItemInput({
             interruptValue={interruptValue}
             onResponseChange={onResponseChange}
             handleSubmit={handleSubmit}
+            handleSchedule={handleSchedule}
+            isScheduling={isScheduling}
+            scheduledTime={scheduledTime}
+            setScheduledTime={setScheduledTime}
           />
         )}
         {streaming && !currentNode && (

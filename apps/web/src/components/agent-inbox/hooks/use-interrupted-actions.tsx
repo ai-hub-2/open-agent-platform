@@ -333,19 +333,49 @@ export default function useInterruptedActions<
     }
 
     try {
-      // For scheduled submit, always use accept action
-      const acceptResponse = humanResponse.find((r) => r.type === "accept");
-      if (!acceptResponse || !acceptAllowed) {
-        toast.error(
-          "Accept action is not available for this interrupt. Cannot schedule.",
+      // Build the candidate responses similarly to handleSubmit
+      const humanResponseInput: HumanResponse[] = humanResponse.flatMap((r) => {
+        if (r.type === "edit") {
+          if (r.acceptAllowed && !r.editsMade) {
+            return {
+              type: "accept",
+              args: r.args,
+            } as HumanResponse;
+          }
+          return {
+            type: "edit",
+            args: r.args,
+          } as HumanResponse;
+        }
+
+        if (r.type === "response" && !r.args) {
+          // Do not include empty response
+          return [] as HumanResponse[];
+        }
+        return {
+          type: r.type,
+          args: r.args,
+        } as HumanResponse;
+      });
+
+      // Determine which input to schedule
+      let desiredType = selectedSubmitType as HumanResponse["type"] | undefined;
+      if (!desiredType) {
+        // Fallback priority: response (if present) > edit (if editsMade) > accept (if allowed)
+        const hasNonEmptyResponse = humanResponse.some(
+          (r) => r.type === "response" && !!r.args,
         );
-        return;
+        if (hasNonEmptyResponse) desiredType = "response";
+        else if (humanResponse.some((r) => r.type === "edit" && r.editsMade))
+          desiredType = "edit";
+        else if (acceptAllowed) desiredType = "accept";
       }
 
-      const input: HumanResponse = {
-        type: "accept",
-        args: acceptResponse.args,
-      };
+      const input = humanResponseInput.find((r) => r.type === desiredType);
+      if (!input) {
+        toast.error("No response found to schedule.");
+        return;
+      }
 
       setLoading(true);
 
@@ -359,15 +389,12 @@ export default function useInterruptedActions<
         return;
       }
 
-      toast.success(
-        `Accept action scheduled for ${scheduledTime.toLocaleString()}`,
-        {
-          description:
-            "The interrupt will be automatically accepted at the scheduled time.",
-          duration: 5000,
-          richColors: true,
-        },
-      );
+      toast.success(`Task scheduled for ${scheduledTime.toLocaleString()}`, {
+        description:
+          "The selected action will run automatically at the scheduled time.",
+        duration: 5000,
+        richColors: true,
+      });
 
       // Navigate back to inbox after scheduling
       const [assistantId, deploymentId] = agentInboxId.split(":");

@@ -13,7 +13,6 @@ import { constructOpenInStudioURL } from "../utils";
 import { ThreadIdCopyable } from "./thread-id";
 import { InboxItemInput } from "./inbox-item-input";
 import { TooltipIconButton } from "@/components/ui/tooltip-icon-button";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
 import {
   STUDIO_NOT_WORKING_TROUBLESHOOTING_URL,
   VIEW_STATE_THREAD_QUERY_PARAM,
@@ -128,6 +127,7 @@ export function ThreadActionsView<
   const [scheduledTime, setScheduledTime] = useState<Date | undefined>(
     undefined,
   );
+  const [isScheduling, setIsScheduling] = useState(false);
 
   // Only use interrupted actions for interrupted threads
   const isInterrupted =
@@ -528,40 +528,7 @@ export function ThreadActionsView<
           )}
         </div>
 
-        {/* Schedule for later section */}
-        <div className="flex w-full flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4">
-          <div>
-            <h3 className="mb-1 text-sm font-medium text-gray-700">
-              Schedule for Later
-            </h3>
-            <p className="text-xs text-gray-600">
-              Select a future date and time to automatically execute this
-              action.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3">
-            <DateTimePicker
-              date={scheduledTime}
-              onDateChange={setScheduledTime}
-              placeholder="Select date and time..."
-            />
-            <div className="flex justify-end">
-              <Button
-                variant="default"
-                disabled={!scheduledTime || actions?.loading}
-                onClick={() => {
-                  if (scheduledTime && actions?.handleScheduledSubmit) {
-                    actions.handleScheduledSubmit(scheduledTime);
-                    // Reset the scheduled time after scheduling
-                    setScheduledTime(undefined);
-                  }
-                }}
-              >
-                Schedule
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Scheduling controls integrated into action cards below */}
       </div>
 
       {/* Actions */}
@@ -588,6 +555,13 @@ export function ThreadActionsView<
               | React.KeyboardEvent,
           ) => {})
         }
+        handleScheduledSubmit={
+          actions?.handleScheduledSubmit ?? (async (_date: Date) => {})
+        }
+        scheduledTime={scheduledTime}
+        setScheduledTime={setScheduledTime}
+        isScheduling={isScheduling}
+        setIsScheduling={setIsScheduling}
       />
     </div>
   );
