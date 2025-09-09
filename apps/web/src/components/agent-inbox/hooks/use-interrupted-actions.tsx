@@ -25,7 +25,6 @@ interface UseInterruptedActionsInput<
 }
 
 interface UseInterruptedActionsValue {
-  // Actions
   handleSubmit: (
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
   ) => Promise<void>;
@@ -349,7 +348,6 @@ export default function useInterruptedActions<
         }
 
         if (r.type === "response" && !r.args) {
-          // Do not include empty response
           return [] as HumanResponse[];
         }
         return {
@@ -358,10 +356,8 @@ export default function useInterruptedActions<
         } as HumanResponse;
       });
 
-      // Determine which input to schedule
       let desiredType = selectedSubmitType as HumanResponse["type"] | undefined;
       if (!desiredType) {
-        // Fallback priority: response (if present) > edit (if editsMade) > accept (if allowed)
         const hasNonEmptyResponse = humanResponse.some(
           (r) => r.type === "response" && !!r.args,
         );
@@ -481,7 +477,6 @@ export default function useInterruptedActions<
     }
 
     setLoading(false);
-    // Clear the selected thread ID to go back to inbox view
     await setSelectedThreadId(null);
   };
 
@@ -496,7 +491,7 @@ export default function useInterruptedActions<
     loading,
     threadId: threadData?.thread.thread_id || "",
     isIgnoreAllowed:
-      Boolean(threadData?.interrupts?.[0]?.config?.allow_ignore) || true, // Default to true for invalid interrupts
+      Boolean(threadData?.interrupts?.[0]?.config?.allow_ignore) || true,
     supportsMultipleMethods:
       humanResponse.filter(
         (r) =>
