@@ -627,13 +627,6 @@ export function InboxItemInput({
     await baseHandleSchedule();
   }, [isScheduling, baseHandleSchedule]);
 
-  const handleScheduleAccept = React.useCallback(async () => {
-    if (!isScheduling) {
-      setSchedulingSection("accept");
-    }
-    await baseHandleSchedule();
-  }, [isScheduling, baseHandleSchedule]);
-
   return (
     <div
       className={cn(
