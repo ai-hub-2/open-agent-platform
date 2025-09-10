@@ -122,6 +122,7 @@ function ThreadsProviderInternal<
           toast.error("Limit Exceeded", {
             description: "Cannot fetch more than 100 threads at a time",
             duration: 3000,
+            richColors: true,
           });
           setLoading(false);
           return;
@@ -237,7 +238,9 @@ function ThreadsProviderInternal<
         setHasMoreThreads(threads.length === limit);
       } catch (e) {
         logger.error("Failed to fetch threads", e);
-        toast.error("Failed to load threads. Please try again.");
+        toast.error("Failed to load threads. Please try again.", {
+          richColors: true,
+        });
       } finally {
         // Always reset loading state, even after errors
         setLoading(false);
@@ -270,7 +273,9 @@ function ThreadsProviderInternal<
       fetchThreads(assistantId, deploymentId, session);
     } catch (e) {
       logger.error("Error occurred while fetching threads", e);
-      toast.error("Failed to load threads. Please try again.");
+      toast.error("Failed to load threads. Please try again.", {
+        richColors: true,
+      });
       // Always reset loading state in case of error
       setLoading(false);
     }
@@ -363,7 +368,9 @@ function ThreadsProviderInternal<
         };
       } catch (error) {
         logger.error("Error fetching single thread", error);
-        toast.error("Failed to load thread details. Please try again.");
+        toast.error("Failed to load thread details. Please try again.", {
+          richColors: true,
+        });
         return undefined;
       }
     },
@@ -400,11 +407,13 @@ function ThreadsProviderInternal<
       toast("Success", {
         description: "Ignored thread",
         duration: 3000,
+        richColors: true,
       });
     } catch (e) {
       logger.error("Error ignoring thread", e);
       toast.error("Failed to ignore thread. Please try again.", {
         duration: 3000,
+        richColors: true,
       });
     } finally {
       setLoading(false);

@@ -146,14 +146,6 @@ function ResponseComponent({
         <ArgsRenderer args={interruptValue.action_request.args} />
       )}
 
-      {isScheduling && (
-        <DateTimePicker
-          date={scheduledTime}
-          onDateChange={setScheduledTime}
-          placeholder="Select date and time..."
-        />
-      )}
-
       <div className="flex w-full flex-col items-start gap-[6px]">
         <p className="min-w-fit text-sm font-medium">Response</p>
         <Textarea
@@ -165,6 +157,14 @@ function ResponseComponent({
           placeholder="Your response here..."
         />
       </div>
+
+      {isScheduling && (
+        <DateTimePicker
+          date={scheduledTime}
+          onDateChange={setScheduledTime}
+          placeholder="Select date and time..."
+        />
+      )}
 
       <div className="flex w-full items-center justify-end gap-0">
         <SplitButton
@@ -337,14 +337,6 @@ function EditAndOrAcceptComponent({
         <ResetButton handleReset={handleReset} />
       </div>
 
-      {isScheduling && (
-        <DateTimePicker
-          date={scheduledTime}
-          onDateChange={setScheduledTime}
-          placeholder="Select date and time..."
-        />
-      )}
-
       {Object.entries(editResponse.args.args).map(([k, v], idx) => {
         const value = ["string", "number"].includes(typeof v)
           ? v
@@ -381,6 +373,14 @@ function EditAndOrAcceptComponent({
           </div>
         );
       })}
+
+      {isScheduling && (
+        <DateTimePicker
+          date={scheduledTime}
+          onDateChange={setScheduledTime}
+          placeholder="Select date and time..."
+        />
+      )}
 
       <div className="flex w-full items-center justify-end gap-0">
         <SplitButton
@@ -442,7 +442,7 @@ export function InboxItemInput({
       (Array.isArray(change) && !Array.isArray(key)) ||
       (!Array.isArray(change) && Array.isArray(key))
     ) {
-      toast.error("Something went wrong");
+      toast.error("Something went wrong", { richColors: true });
       return;
     }
 
@@ -580,7 +580,7 @@ export function InboxItemInput({
     });
   };
 
-  const handleSchedule = React.useCallback(() => {
+  const handleSchedule = React.useCallback(async () => {
     if (!isScheduling) {
       setIsScheduling(true);
       return;
@@ -592,14 +592,13 @@ export function InboxItemInput({
       });
       return;
     }
-    handleScheduledSubmit(scheduledTime)
-      .then(() => {
-        setIsScheduling(false);
-        setScheduledTime(undefined);
-      })
-      .catch(() => {
-        // Error toast is handled in the action hook
-      });
+    try {
+      await handleScheduledSubmit(scheduledTime);
+      setIsScheduling(false);
+      setScheduledTime(undefined);
+    } catch {
+      // Error toast is handled in the action hook
+    }
   }, [
     isScheduling,
     scheduledTime,

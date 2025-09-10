@@ -74,7 +74,7 @@ export function Pagination() {
 
   const handleClickNext = async () => {
     if (!selectedInbox) {
-      toast.error("No inbox selected");
+      toast.error("No inbox selected", { richColors: true });
       return;
     }
 
@@ -84,7 +84,7 @@ export function Pagination() {
 
   const handleClickPrevious = async () => {
     if (!selectedInbox) {
-      toast.error("No inbox selected");
+      toast.error("No inbox selected", { richColors: true });
       return;
     }
 

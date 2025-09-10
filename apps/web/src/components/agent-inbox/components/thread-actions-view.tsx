@@ -199,6 +199,7 @@ export function ThreadActionsView<
       toast("Refreshing thread", {
         description: "Checking for updates to the thread status...",
         duration: 3000,
+        richColors: true,
       });
 
       // Fetch the latest thread data using the ThreadsContext
@@ -207,10 +208,13 @@ export function ThreadActionsView<
       toast("Thread refreshed", {
         description: "Thread information has been updated.",
         duration: 3000,
+        richColors: true,
       });
     } catch (error) {
       logger.error("Error refreshing thread:", error);
-      toast.error("Failed to refresh thread information.");
+      toast.error("Failed to refresh thread information.", {
+        richColors: true,
+      });
     } finally {
       setRefreshing(false);
     }

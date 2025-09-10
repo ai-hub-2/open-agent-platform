@@ -140,15 +140,15 @@ export default function useInterruptedActions<
       return;
     }
     if (!threadData || !setThreadData) {
-      toast.error("Thread data is not available");
+      toast.error("Thread data is not available", { richColors: true });
       return;
     }
     if (!humanResponse) {
-      toast.error("Please enter a response.");
+      toast.error("Please enter a response.", { richColors: true });
       return;
     }
     if (!selectedInbox) {
-      toast.error("No inbox selected");
+      toast.error("No inbox selected", { richColors: true });
       return;
     }
 
@@ -193,7 +193,7 @@ export default function useInterruptedActions<
           (r) => r.type === selectedSubmitType,
         );
         if (!input) {
-          toast.error("No response found.");
+          toast.error("No response found.", { richColors: true });
           return;
         }
 
@@ -214,6 +214,7 @@ export default function useInterruptedActions<
 
         toast.success("Response submitted successfully.", {
           duration: 5000,
+          richColors: true,
         });
 
         for await (const chunk of response) {
@@ -239,6 +240,7 @@ export default function useInterruptedActions<
                 </div>
               ),
               duration: 15000,
+              richColors: true,
             });
             setCurrentNode("__error__");
             errorOccurred = true;
@@ -256,10 +258,12 @@ export default function useInterruptedActions<
             description:
               "The provided assistant ID was not found in this graph. Please update the assistant ID in the settings and try again.",
             duration: 5000,
+            richColors: true,
           });
         } else {
           toast.error("Failed to submit response.", {
             duration: 5000,
+            richColors: true,
           });
         }
 
@@ -307,6 +311,7 @@ export default function useInterruptedActions<
 
       toast.success("Response submitted successfully.", {
         duration: 5000,
+        richColors: true,
       });
     }
 

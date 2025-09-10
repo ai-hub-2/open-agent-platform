@@ -40,6 +40,7 @@ export function GenericInboxItem<
     if (!agentInboxId) {
       toast.error("No agent inbox selected.", {
         duration: 5000,
+        richColors: true,
       });
       return;
     }
@@ -75,6 +76,7 @@ export function GenericInboxItem<
             </>
           ),
           duration: 10000,
+          richColors: true,
         },
       );
     } else {
