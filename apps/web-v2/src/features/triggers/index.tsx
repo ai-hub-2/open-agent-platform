@@ -10,16 +10,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Zap } from "lucide-react";
-import { ListUserTriggersData, useTriggers } from "@/hooks/use-triggers";
+import {
+  ListTriggerRegistrationsData,
+  useTriggers,
+} from "@/hooks/use-triggers";
 import { useEffect, useState } from "react";
 import type { Trigger } from "@/types/triggers";
 import { toast } from "sonner";
-import { groupUserRegisteredTriggersByProvider } from "@/lib/environment/triggers";
+import { groupUserRegisteredTriggersByProvider } from "@/lib/triggers";
 
 export default function TriggersInterface() {
   const [triggersLoading, setTriggersLoading] = useState(true);
   const [triggers, setTriggers] = useState<Trigger[]>([]);
-  const [userTriggers, setUserTriggers] = useState<ListUserTriggersData[]>([]);
+  const [userTriggers, setUserTriggers] = useState<
+    ListTriggerRegistrationsData[]
+  >([]);
   const auth = useAuthContext();
   const { listTriggers, listUserTriggers } = useTriggers();
 
@@ -141,7 +146,7 @@ export default function TriggersInterface() {
             trigger={trigger}
             userTriggers={
               groupUserRegisteredTriggersByProvider(userTriggers)?.[
-                trigger.providerId
+                trigger.id
               ] || []
             }
           />
