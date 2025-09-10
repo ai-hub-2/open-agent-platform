@@ -433,6 +433,11 @@ export function InboxItemInput({
     hasArgs && !showArgsInResponse && !isEditAllowed && !acceptAllowed;
   const isError = currentNode === "__error__";
 
+  // Track which section is currently scheduling to scope the date picker
+  const [schedulingSection, setSchedulingSection] = React.useState<
+    "edit" | "response" | "accept" | undefined
+  >(undefined);
+
   const onEditChange = (
     change: string | string[],
     response: HumanResponseWithEdits,
@@ -580,7 +585,7 @@ export function InboxItemInput({
     });
   };
 
-  const handleSchedule = React.useCallback(async () => {
+  const baseHandleSchedule = React.useCallback(async () => {
     if (!isScheduling) {
       setIsScheduling(true);
       return;
@@ -596,6 +601,7 @@ export function InboxItemInput({
       await handleScheduledSubmit(scheduledTime);
       setIsScheduling(false);
       setScheduledTime(undefined);
+      setSchedulingSection(undefined);
     } catch {
       // Error toast is handled in the action hook
     }
@@ -606,6 +612,27 @@ export function InboxItemInput({
     setIsScheduling,
     setScheduledTime,
   ]);
+
+  const handleScheduleEdit = React.useCallback(async () => {
+    if (!isScheduling) {
+      setSchedulingSection("edit");
+    }
+    await baseHandleSchedule();
+  }, [isScheduling, baseHandleSchedule]);
+
+  const handleScheduleResponse = React.useCallback(async () => {
+    if (!isScheduling) {
+      setSchedulingSection("response");
+    }
+    await baseHandleSchedule();
+  }, [isScheduling, baseHandleSchedule]);
+
+  const handleScheduleAccept = React.useCallback(async () => {
+    if (!isScheduling) {
+      setSchedulingSection("accept");
+    }
+    await baseHandleSchedule();
+  }, [isScheduling, baseHandleSchedule]);
 
   return (
     <div
@@ -626,8 +653,8 @@ export function InboxItemInput({
           interruptValue={interruptValue}
           onEditChange={onEditChange}
           handleSubmit={handleSubmit}
-          handleSchedule={handleSchedule}
-          isScheduling={isScheduling}
+          handleSchedule={handleScheduleEdit}
+          isScheduling={isScheduling && schedulingSection === "edit"}
           scheduledTime={scheduledTime}
           setScheduledTime={setScheduledTime}
         />
@@ -644,8 +671,8 @@ export function InboxItemInput({
             interruptValue={interruptValue}
             onResponseChange={onResponseChange}
             handleSubmit={handleSubmit}
-            handleSchedule={handleSchedule}
-            isScheduling={isScheduling}
+            handleSchedule={handleScheduleResponse}
+            isScheduling={isScheduling && schedulingSection === "response"}
             scheduledTime={scheduledTime}
             setScheduledTime={setScheduledTime}
           />
