@@ -3,6 +3,10 @@
 import { AuthDebug } from "@/components/auth/debug";
 import { AuthProvider } from "@/providers/Auth";
 
+// Prevent static prerendering and caching so missing env vars do not break builds
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default function DebugAuthPage() {
   return (
     <AuthProvider>
