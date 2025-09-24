@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "yarn run build",
+  "installCommand": "corepack enable && corepack prepare yarn@3.5.1 --activate && yarn install",
+  "framework": null
+}

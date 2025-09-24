@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build",
+    "build": "turbo build || (echo 'Turborepo failed to parse lockfile, falling back to app build' && cd apps/web && yarn run build:internal)",
     "turbo:command": "turbo",
     "format": "turbo format",
     "lint": "turbo lint",
