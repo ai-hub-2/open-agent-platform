@@ -19,7 +19,17 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Missing Supabase URL or Anon Key");
+    // If Supabase is not configured, allow public pages and API to proceed without auth
+    if (
+      NO_AUTH_PATHS.some((path) => request.nextUrl.pathname.startsWith(path)) ||
+      request.nextUrl.pathname.startsWith("/api/")
+    ) {
+      return supabaseResponse;
+    }
+    // Otherwise, redirect to signin so user knows auth is required
+    const url = request.nextUrl.clone();
+    url.pathname = "/signin";
+    return NextResponse.redirect(url);
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
