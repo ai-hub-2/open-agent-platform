@@ -11,6 +11,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import React from "react";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 /**
  * The /agents page.
  * Contains the list of all agents the user has access to.
@@ -31,7 +34,14 @@ export default function AgentsPage(): React.ReactNode {
           </Breadcrumb>
         </div>
       </header>
-      <AgentsInterface />
+      {/* Render interface only when deployments are configured to avoid build-time errors */}
+      {process.env.NEXT_PUBLIC_DEPLOYMENTS ? (
+        <AgentsInterface />
+      ) : (
+        <div className="px-4 py-8 text-sm text-muted-foreground">
+          No deployments configured. Set NEXT_PUBLIC_DEPLOYMENTS to enable agents.
+        </div>
+      )}
     </React.Suspense>
   );
 }

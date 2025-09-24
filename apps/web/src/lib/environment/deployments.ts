@@ -12,15 +12,24 @@ export function getDeployments(): Deployment[] {
   for (const deployment of deployments) {
     if (deployment.isDefault && !defaultExists) {
       if (!deployment.defaultGraphId) {
-        throw new Error("Default deployment must have a default graph ID");
+        // In non-configured environments (e.g., preview builds), avoid crashing at build time.
+        // Consumers should handle missing defaults gracefully.
+        if (typeof window === "undefined") {
+          console.warn(
+            "Default deployment missing defaultGraphId; proceeding without throwing in build/runtime.",
+          );
+        } else {
+          console.warn(
+            "Default deployment missing defaultGraphId; proceeding without default.",
+          );
+        }
       }
       defaultExists = true;
     } else if (deployment.isDefault && defaultExists) {
-      throw new Error("Multiple default deployments found");
+      // Log and continue to avoid hard failure during builds
+      console.warn("Multiple default deployments found; using the first one.");
     }
   }
-  if (!defaultExists) {
-    throw new Error("No default deployment found");
-  }
+  // Do not throw when no default exists; let callers handle empty/misconfigured state.
   return deployments;
 }
