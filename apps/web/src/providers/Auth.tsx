@@ -39,11 +39,19 @@ interface AuthContextProps {
   }>;
 }
 
-// Create default authentication provider (Supabase in this case)
-const authProvider = new SupabaseAuthProvider({
-  redirectUrl:
-    typeof window !== "undefined" ? window.location.origin : undefined,
-});
+// Factory to lazily create the default authentication provider (Supabase)
+function createDefaultAuthProvider(): CustomAuthProvider | null {
+  try {
+    return new SupabaseAuthProvider({
+      redirectUrl:
+        typeof window !== "undefined" ? window.location.origin : undefined,
+    });
+  } catch (_e) {
+    // Missing env at build-time or server environments without required vars.
+    // Return null to allow pages to render without crashing.
+    return null;
+  }
+}
 
 // Create auth context
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -56,7 +64,7 @@ export function AuthProvider({
   customAuthProvider?: CustomAuthProvider;
 }) {
   // Use the provided auth provider or default to Supabase
-  const provider = customAuthProvider || authProvider;
+  const provider = customAuthProvider || createDefaultAuthProvider();
 
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -64,6 +72,10 @@ export function AuthProvider({
 
   // Load initial session on mount
   useEffect(() => {
+    if (!provider) {
+      setIsLoading(false);
+      return;
+    }
     const initializeAuth = async () => {
       try {
         // Get the current session
@@ -86,6 +98,7 @@ export function AuthProvider({
 
   // Set up auth state change listener
   useEffect(() => {
+    if (!provider) return;
     const { unsubscribe } = provider.onAuthStateChange((newSession) => {
       setSession(newSession);
       setUser(newSession?.user || null);
@@ -101,13 +114,13 @@ export function AuthProvider({
     user,
     isLoading,
     isAuthenticated: !!session?.user,
-    signIn: provider.signIn.bind(provider),
-    signUp: provider.signUp.bind(provider),
-    signInWithGoogle: provider.signInWithGoogle.bind(provider),
-    signOut: provider.signOut.bind(provider),
-    resetPassword: provider.resetPassword.bind(provider),
-    updatePassword: provider.updatePassword.bind(provider),
-    updateUser: provider.updateUser.bind(provider),
+    signIn: provider?.signIn.bind(provider as any) ?? (async () => ({ user: null, session: null, error: { message: "Auth disabled", status: 500 } } as any)),
+    signUp: provider?.signUp.bind(provider as any) ?? (async () => ({ user: null, session: null, error: { message: "Auth disabled", status: 500 } } as any)),
+    signInWithGoogle: provider?.signInWithGoogle.bind(provider as any) ?? (async () => ({ user: null, session: null, error: { message: "Auth disabled", status: 500 } } as any)),
+    signOut: provider?.signOut.bind(provider as any) ?? (async () => ({ error: { message: "Auth disabled", status: 500 } } as any)),
+    resetPassword: provider?.resetPassword.bind(provider as any) ?? (async () => ({ error: { message: "Auth disabled", status: 500 } } as any)),
+    updatePassword: provider?.updatePassword.bind(provider as any) ?? (async () => ({ error: { message: "Auth disabled", status: 500 } } as any)),
+    updateUser: provider?.updateUser.bind(provider as any) ?? (async () => ({ user: null, error: { message: "Auth disabled", status: 500 } } as any)),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

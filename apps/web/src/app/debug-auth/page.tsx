@@ -3,6 +3,10 @@
 import { AuthDebug } from "@/components/auth/debug";
 import { AuthProvider } from "@/providers/Auth";
 
+// Prevent static prerendering and caching so missing env vars do not break builds
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default function DebugAuthPage() {
   return (
     <AuthProvider>
@@ -13,7 +17,15 @@ export default function DebugAuthPage() {
           only accessible in development mode.
         </p>
 
-        <AuthDebug />
+        {/* Render AuthDebug only if Supabase is configured at runtime */}
+        {process.env.NEXT_PUBLIC_SUPABASE_URL &&
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? (
+          <AuthDebug />
+        ) : (
+          <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+            Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable auth debugging.
+          </div>
+        )}
 
         <div className="bg-muted/30 mt-8 rounded-lg border p-4">
           <h2 className="mb-2 text-lg font-medium">Testing Tips</h2>
