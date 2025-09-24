@@ -1,68 +1,45 @@
 import type { NextRequest } from "next/server";
+import { getSupabaseClient } from "@/lib/auth/supabase-client";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const error = searchParams.get("error");
-  const errorDescription = searchParams.get("error_description");
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get("code");
+  const redirectTo = requestUrl.searchParams.get("redirect") || "/";
 
-  const redirectUrl = new URL("/", request.nextUrl.origin);
+  const error = requestUrl.searchParams.get("error");
+  const errorDescription = requestUrl.searchParams.get("error_description");
+
   if (error) {
-    redirectUrl.pathname = "/signin";
-    redirectUrl.searchParams.set(
+    const back = new URL("/signin", requestUrl.origin);
+    back.searchParams.set(
       "error",
       errorDescription || error || "Google sign-in failed",
     );
+    return Response.redirect(back);
   }
 
-  return Response.redirect(redirectUrl);
-}
-
-export async function POST(request: NextRequest) {
-  // Some providers may POST back; normalize by redirecting in the same way
-  return GET(request);
-}
-
-import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/lib/auth/supabase-client";
-
-export async function GET(request: NextRequest) {
-  try {
-    // Parse the URL and get the code parameter
-    const requestUrl = new URL(request.url);
-    const code = requestUrl.searchParams.get("code");
-
-    // Get the redirect destination (or default to home)
-    const redirectTo = requestUrl.searchParams.get("redirect") || "/";
-
-    if (code) {
-      // Get Supabase client
+  if (code) {
+    try {
       const supabase = getSupabaseClient();
-
-      // Exchange the code for a session
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (error) {
-        console.error("Error exchanging code for session:", error);
-        throw error;
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
+        code,
+      );
+      if (exchangeError) {
+        throw exchangeError;
       }
-
-      // Successfully authenticated
+    } catch (_e) {
+      const errUrl = new URL("/signin", requestUrl.origin);
+      errUrl.searchParams.set(
+        "error",
+        "Authentication failed. Please try again.",
+      );
+      return Response.redirect(errUrl);
     }
-
-    // Redirect to the requested page or home
-    return NextResponse.redirect(new URL(redirectTo, request.url));
-  } catch (error) {
-    console.error("Auth callback error:", error);
-
-    // In case of error, redirect to sign-in with error message
-    const errorUrl = new URL("/signin", request.url);
-    errorUrl.searchParams.set(
-      "error",
-      "Authentication failed. Please try again.",
-    );
-
-    return NextResponse.redirect(errorUrl);
   }
+
+  return Response.redirect(new URL(redirectTo, requestUrl.origin));
 }
+
+export const POST = GET;
