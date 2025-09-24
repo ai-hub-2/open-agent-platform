@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "corepack enable && corepack prepare yarn@3.5.1 --activate && yarn install",
-  "buildCommand": "cd apps/web && yarn build",
+  "buildCommand": "yarn workspace @open-agent-platform/web build",
   "framework": "nextjs"
 }
