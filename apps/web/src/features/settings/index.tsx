@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * The Settings interface component containing API Keys configuration.
@@ -184,6 +185,22 @@ export default function SettingsInterface(): React.ReactNode {
                 value={defaultModel}
                 onChange={(e) => setDefaultModel(e.target.value)}
               />
+            )}
+            {defaultProvider === "openrouter" && (
+              <Alert className="mt-2" variant="info">
+                <AlertDescription>
+                  If you see "Unsupported provider: provider is not enabled", go to your OpenRouter dashboard and enable the provider for the selected model: {""}
+                  <a
+                    className="underline font-medium"
+                    href="https://openrouter.ai/settings/providers"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Manage OpenRouter providers
+                  </a>
+                  .
+                </AlertDescription>
+              </Alert>
             )}
           </div>
         </div>
