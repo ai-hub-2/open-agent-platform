@@ -17,6 +17,30 @@ export function useApiKeys() {
     "lg:settings:tavilyApiKey",
     "",
   );
+  const [openrouterApiKey] = useLocalStorage<string>(
+    "lg:settings:openrouterApiKey",
+    "",
+  );
+  const [mistralApiKey] = useLocalStorage<string>(
+    "lg:settings:mistralApiKey",
+    "",
+  );
+  const [cohereApiKey] = useLocalStorage<string>(
+    "lg:settings:cohereApiKey",
+    "",
+  );
+  const [groqApiKey] = useLocalStorage<string>(
+    "lg:settings:groqApiKey",
+    "",
+  );
+  const [perplexityApiKey] = useLocalStorage<string>(
+    "lg:settings:perplexityApiKey",
+    "",
+  );
+  const [xaiApiKey] = useLocalStorage<string>(
+    "lg:settings:xaiApiKey",
+    "",
+  );
 
   return {
     apiKeys: {
@@ -24,6 +48,12 @@ export function useApiKeys() {
       ANTHROPIC_API_KEY: anthropicApiKey,
       GOOGLE_API_KEY: googleApiKey,
       TAVILY_API_KEY: tavilyApiKey,
+      OPENROUTER_API_KEY: openrouterApiKey,
+      MISTRAL_API_KEY: mistralApiKey,
+      COHERE_API_KEY: cohereApiKey,
+      GROQ_API_KEY: groqApiKey,
+      PERPLEXITY_API_KEY: perplexityApiKey,
+      XAI_API_KEY: xaiApiKey,
     },
   };
 }
