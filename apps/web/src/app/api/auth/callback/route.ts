@@ -1,4 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const error = searchParams.get("error");
+  const errorDescription = searchParams.get("error_description");
+
+  const redirectUrl = new URL("/", request.nextUrl.origin);
+  if (error) {
+    redirectUrl.pathname = "/signin";
+    redirectUrl.searchParams.set(
+      "error",
+      errorDescription || error || "Google sign-in failed",
+    );
+  }
+
+  return NextResponse.redirect(redirectUrl);
+}
+
+export async function POST(request: NextRequest) {
+  // Some providers may POST back; normalize by redirecting in the same way
+  return GET(request);
+}
+
+import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/auth/supabase-client";
 
 export async function GET(request: NextRequest) {

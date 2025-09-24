@@ -20,7 +20,9 @@ export class SupabaseAuthProvider implements AuthProvider {
       redirectUrl:
         typeof window !== "undefined"
           ? `${window.location.origin}/api/auth/callback`
-          : undefined,
+          : process.env.NEXT_PUBLIC_BASE_URL
+            ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/callback`
+            : undefined,
       ...options,
     };
   }
